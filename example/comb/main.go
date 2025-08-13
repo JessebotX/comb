@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/JessebotX/cog"
+	"github.com/JessebotX/comb"
 )
 
 var cli struct {
@@ -23,5 +23,5 @@ func main() {
 		"init",
 	}
 
-	_, _ = cog.Parse(args, &cli)
+	_, _ = comb.Parse(args, &cli)
 }

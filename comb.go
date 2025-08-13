@@ -1,8 +1,9 @@
-package cog
+package comb
 
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Context struct{}
@@ -23,7 +24,9 @@ func Parse(args []string, cli any) (Context, error) {
 			continue
 		}
 
-		set(arg, rValue, rType)
+		if err := set(arg, rValue, rType); err != nil {
+			return Context{}, err
+		}
 
 		*arg = ""
 	}
@@ -33,16 +36,27 @@ func Parse(args []string, cli any) (Context, error) {
 	return Context{}, nil
 }
 
-func set(arg *string, cliReflectValue reflect.Value, cliReflectType reflect.Type) {
+func set(arg *string, cliReflectValue reflect.Value, cliReflectType reflect.Type) error {
 	for i := 0; i < cliReflectType.NumField(); i++ {
 		field := cliReflectType.Field(i)
 
+		if strings.EqualFold(*arg, "-h") || strings.EqualFold(*arg, "-help") {
+			fmt.Print("FLAG: <SPECIAL HELP FLAG>\n")
+			return nil
+		}
+
+		cmdName, ok := field.Tag.Lookup("cmd")
+		if ok && strings.EqualFold(*arg, cmdName) {
+			fmt.Printf("CMD:   %s\n", cmdName)
+			return nil
+		}
+
 		flagName, ok := field.Tag.Lookup("flag")
-		if ok {
-			if *arg == "-" + flagName {
-				fmt.Printf("found flag -%s\n", flagName)
-				return
-			}
+		if ok && strings.EqualFold(*arg, "-"+flagName) {
+			fmt.Printf("FLAG: -%s\n", flagName)
+			return nil
 		}
 	}
+
+	return nil
 }
