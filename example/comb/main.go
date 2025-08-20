@@ -15,16 +15,22 @@ var cli struct {
 }
 
 type InitCommand struct {
-	InitThreads int `flag:"init-threads" help:"Max number of threads to use"`
+	InitThreads int            `flag:"init-threads" help:"Max number of threads to use"`
+	New         InitNewCommand `cmd:"new" help:"Initialize new project..."`
+}
+
+type InitNewCommand struct {
+	TestInt int `flag:"test-int" help:"Test int value"`
 }
 
 func main() {
 	args := []string{
 		"example (program name)",
+		"new",
 		"-h",
 		"-verbose",
 		"-init-threads",
-		"2",
+		"28",
 		"init",
 		"-test-float",
 		"16.25",
@@ -34,10 +40,11 @@ func main() {
 		"16",
 	}
 
-	_, err := comb.Parse(args, &cli)
+	context, err := comb.Parse(args, &cli)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf("%+v\n", cli)
+	log.Printf("%+v\n", context.Rest)
 }
